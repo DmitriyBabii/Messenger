@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Chats</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="../static/css/style.css">
+</head>
+<body>
+
+<div class="content-box">
+
+    <div th:insert="menu :: menu_fragment"></div>
+
+    <div class="info-box">
+
+        <div class="chat-box">
+            <div class="chats">
+                <div th:each="chat : ${chats}">
+                    <a class="chat" th:href="@{/chats/{id}(id=${chat.id})}">
+                        <img class="ava-chat" th:src="@{/images/ava.jpg}" src="../static/images/ava.jpg">
+                        <p class="name-chat" th:text="${chat.name}">Chat name</p>
+                    </a>
+                </div>
+            </div>
+
+            <form class="create-chat" th:action="@{/chats/create}">
+                <button class="btn">Create new chat</button>
+            </form>
+        </div>
+
+        <div class="message-box">
+            <div th:if="${chat != null}" th:each="mess : ${messages}">
+                <div class="message sent-message" th:if="${mess.account.phoneNumber == account.phoneNumber}">
+                    <p class="text-message" th:text="|${mess.text}|">A lot of texttttttttttttttttttttttttttttt</p>
+                    <div class="time" th:text="|${mess.time}|">22:24</div>
+                </div>
+
+                <div class="message coming-message" th:unless="${mess.account.phoneNumber == account.phoneNumber}">
+                    <p class="sender" th:text="|${mess.account.username}|">Michale</p>
+                    <p class="text-message" th:text="|${mess.text}|">A lot of texttttttttttttttttttttttttttttt</p>
+                    <div class="time" th:text="|${mess.time}|">22:24</div>
+                </div>
+            </div>
+
+            <form class="input-massage" th:if="${chat != null}" th:action="@{/chats/{id}(id=${chat.id})}"
+                  th:object="${message}" method="post">
+                <input class="input" placeholder="Enter your message" th:field="*{text}" required>
+                <button class="btn">Send</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

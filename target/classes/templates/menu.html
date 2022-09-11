@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Menu</title>
+        <link rel="stylesheet" href="../static/css/style.css">
+    </head>
+    <body>
+    <div th:fragment="menu_fragment">
+        <nav class="nav-bar">
+            <div class="menu">
+                <a class="menu-item" th:href="@{/account/register}" href="/accounts/register">
+                    <div class="menu-text">Registration</div>
+                </a>
+                <a class="menu-item" th:href="@{/account/login}" href="/accounts/login">
+                    <div class="menu-text">Login</div>
+                </a>
+                <a class="menu-item" th:href="@{/chats}" href="/chats">
+                    <div class="menu-text">Chats</div>
+                </a>
+                <a class="menu-item" th:href="@{/account}" href="/accounts/register">
+                    <div class="menu-text">Account</div>
+                </a>
+            </div>
+        </nav>
+    </div>
+    </body>
+</html>

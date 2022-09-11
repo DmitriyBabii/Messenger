@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Create chat</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="../static/css/style.css">
+</head>
+<body>
+
+<div class="no-chat content-box">
+
+    <div th:insert="menu :: menu_fragment"></div>
+
+    <div class="register-box">
+        <div class="greetings">
+            <img class="ava-register" th:src="@{/images/ava.jpg}" src="../static/images/ava.jpg">
+            <p class="welcome-text">Let`s invite your contact</p>
+        </div>
+        <form class="register-form" th:action="@{/chats/create}" th:object="${chat}" method="post">
+            <p class="title">Create chat</p>
+            <input class="register-element input" placeholder="Enter chat name" th:field="*{name}" required>
+            <input class="register-element input" placeholder="Enter phone number your contact"
+                   th:field="${member.memberNumber}" required>
+            <button class="register-element btn">Create</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

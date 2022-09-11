@@ -6,9 +6,14 @@
 
 # BlueJ files
 *.ctxt
+*.iml
+mvnw
+mvnw.cmd
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
+.idea
+.mvn
 
 # Package Files #
 *.jar

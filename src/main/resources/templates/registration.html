@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Registration</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="../static/css/style.css">
+</head>
+<body>
+
+<div class="no-chat content-box">
+
+    <div th:insert="menu :: menu_fragment"></div>
+
+    <div class="register-box">
+        <div class="greetings">
+            <img class="ava-register" th:src="@{/images/ava.jpg}" src="../static/images/ava.jpg">
+            <p class="welcome-text">Hello, let`s know each other</p>
+        </div>
+        <form class="register-form" th:action="@{/account/register}" th:object="${account}" method="post">
+            <p class="title">Registration</p>
+            <input class="register-element input" placeholder="Enter your username" th:field="*{username}" required>
+            <input class="register-element input" placeholder="Enter your phone number" th:field="*{phoneNumber}" required>
+            <input class="password register-element input" placeholder="Enter your password" th:field="*{password}" required>
+            <button class="register-element btn">Register</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
