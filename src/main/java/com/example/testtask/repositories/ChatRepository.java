@@ -1,6 +1,6 @@
 package com.example.testtask.repositories;
 
-import com.example.testtask.models.Chat;
+import com.example.testtask.models.entity.Chat;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

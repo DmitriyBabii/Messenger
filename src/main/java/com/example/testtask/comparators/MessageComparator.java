@@ -1,7 +1,7 @@
 package com.example.testtask.comparators;
 
 
-import com.example.testtask.models.Message;
+import com.example.testtask.models.entity.Message;
 
 import java.util.Comparator;
 

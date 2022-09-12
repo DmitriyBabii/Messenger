@@ -1,6 +1,5 @@
-package com.example.testtask.models;
+package com.example.testtask.models.entity;
 
-import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;

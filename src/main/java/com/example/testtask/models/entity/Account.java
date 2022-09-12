@@ -1,4 +1,4 @@
-package com.example.testtask.models;
+package com.example.testtask.models.entity;
 
 import org.hibernate.annotations.GenericGenerator;
 
