@@ -1,37 +1,34 @@
 package com.example.testtask.controllers;
 
 import com.example.testtask.beans.HttpSession;
-import com.example.testtask.models.Account;
-import com.example.testtask.models.Message;
-import com.example.testtask.services.AccountService;
-import com.example.testtask.services.MessageService;
+import com.example.testtask.events.accounts.CheckLoginAccountEvent;
+import com.example.testtask.events.accounts.CreateAccountEvent;
+import com.example.testtask.events.accounts.GetAccountByPhoneAndPasswordEvent;
+import com.example.testtask.interfaces.Eventable;
+import com.example.testtask.models.entity.Account;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping("/account")
-public class AccountController {
+public class AccountController implements Eventable {
 
-    private final AccountService accountService;
-    private final MessageService messageService;
     private final HttpSession session;
+    private final ApplicationEventPublisher aep;
 
     @Autowired
-    public AccountController(AccountService accountService, MessageService messageService, HttpSession session) {
-        this.accountService = accountService;
-        this.messageService = messageService;
+    public AccountController(HttpSession session, ApplicationEventPublisher aep) {
         this.session = session;
+        this.aep = aep;
     }
 
     @GetMapping
     public ModelAndView getAccount(ModelAndView modelAndView) {
-        if (session == null) {
-            return new ModelAndView("redirect:/account/login");
-        }
-        Account account = accountService.findAccount(session.getPhoneNumber(), session.getPassword());
-        if (account != null) {
-            modelAndView.addObject("account", account);
+        aep.publishEvent(new GetAccountByPhoneAndPasswordEvent(this, session.getPhoneNumber(), session.getPassword()));
+        if (status.get() && returns.isPresent()) {
+            modelAndView.addObject("account", returns.get());
             modelAndView.setViewName("account.html");
             return modelAndView;
         }
@@ -40,7 +37,6 @@ public class AccountController {
 
     @PostMapping
     public ModelAndView exit(ModelAndView modelAndView) {
-        Account account = new Account();
         session.clear();
         return new ModelAndView("redirect:/account/login");
     }
@@ -55,7 +51,8 @@ public class AccountController {
 
     @PostMapping("/register")
     public ModelAndView saveAccount(@ModelAttribute Account account, ModelAndView modelAndView) {
-        if (accountService.saveAccount(account)) {
+        aep.publishEvent(new CreateAccountEvent(this, account));
+        if (status.get()) {
             session.setPhoneNumber(account.getPhoneNumber());
             session.setPassword(account.getPassword());
             return new ModelAndView("redirect:/account");
@@ -73,13 +70,10 @@ public class AccountController {
 
     @PostMapping("/login")
     public ModelAndView getAccount(@ModelAttribute Account account, ModelAndView modelAndView) {
-        if (session == null) {
-            return new ModelAndView("redirect:/account");
-        }
-        Account accountSQL = accountService.findAccount(account.getPhoneNumber(), account.getPassword());
-        if (accountSQL != null) {
-            session.setPhoneNumber(accountSQL.getPhoneNumber());
-            session.setPassword(accountSQL.getPassword());
+        aep.publishEvent(new CheckLoginAccountEvent(this, account));
+        if (status.get()) {
+            session.setPhoneNumber(account.getPhoneNumber());
+            session.setPassword(account.getPassword());
             return new ModelAndView("redirect:/account");
         }
         return login(modelAndView);
