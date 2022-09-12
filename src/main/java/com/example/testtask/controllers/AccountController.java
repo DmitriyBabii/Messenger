@@ -26,6 +26,9 @@ public class AccountController {
 
     @GetMapping
     public ModelAndView getAccount(ModelAndView modelAndView) {
+        if (session == null) {
+            return new ModelAndView("redirect:/account/login");
+        }
         Account account = accountService.findAccount(session.getPhoneNumber(), session.getPassword());
         if (account != null) {
             modelAndView.addObject("account", account);
@@ -70,6 +73,9 @@ public class AccountController {
 
     @PostMapping("/login")
     public ModelAndView getAccount(@ModelAttribute Account account, ModelAndView modelAndView) {
+        if (session == null) {
+            return new ModelAndView("redirect:/account");
+        }
         Account accountSQL = accountService.findAccount(account.getPhoneNumber(), account.getPassword());
         if (accountSQL != null) {
             session.setPhoneNumber(accountSQL.getPhoneNumber());

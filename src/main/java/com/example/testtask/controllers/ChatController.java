@@ -44,11 +44,16 @@ public class ChatController {
 
     @GetMapping
     public ModelAndView getChats(ModelAndView modelAndView) {
+        if (session == null) {
+            return modelAndView;
+        }
         Account account = accountService.findAccount(session.getPhoneNumber(), session.getPassword());
-        List<Chat> chats = chatService.findByAccount(account);
-        modelAndView.addObject("inChat", false);
-        modelAndView.addObject("chats", chats);
-        modelAndView.setViewName("chats.html");
+        if (account != null) {
+            List<Chat> chats = chatService.findByAccount(account);
+            modelAndView.addObject("inChat", false);
+            modelAndView.addObject("chats", chats);
+            modelAndView.setViewName("chats.html");
+        }
         return modelAndView;
     }
 
@@ -64,8 +69,11 @@ public class ChatController {
 
     @PostMapping("/create")
     public ModelAndView saveChat(@ModelAttribute Chat chat, @ModelAttribute ChatMember member) {
-        if (session.isPresent()) {
-            Account creator = accountService.findAccount(session.getPhoneNumber(), session.getPassword());
+        if (session == null) {
+            return new ModelAndView("redirect:/chats");
+        }
+        Account creator = accountService.findAccount(session.getPhoneNumber(), session.getPassword());
+        if (creator != null) {
             Account guest = accountService.findAccount(member.getMemberNumber());
             //Message message = new Message("Text", creator, chat);
             //creator.addMessage(message);
@@ -79,6 +87,9 @@ public class ChatController {
 
     @GetMapping("/{id}")
     public ModelAndView getMessages(@PathVariable String id, ModelAndView modelAndView) {
+        if (session == null) {
+            return modelAndView;
+        }
         Account account = accountService.findAccount(session.getPhoneNumber(), session.getPassword());
         if (account != null) {
             List<Chat> chats = chatService.findByAccount(account);
@@ -102,6 +113,9 @@ public class ChatController {
 
     @PostMapping("/{id}")
     public ModelAndView saveMessage(@PathVariable String id, @ModelAttribute Message message, ModelAndView modelAndView) {
+        if (session == null) {
+            return new ModelAndView("redirect:/chats/" + id);
+        }
         Account account = accountService.findAccount(session.getPhoneNumber(), session.getPassword());
         if (account != null) {
             Optional<Chat> optional = chatService.findById(id);
