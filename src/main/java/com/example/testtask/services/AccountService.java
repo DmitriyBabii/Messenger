@@ -7,9 +7,8 @@ import com.example.testtask.events.accounts.GetAccountByPhoneEvent;
 import com.example.testtask.models.entity.Account;
 import com.example.testtask.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,58 +40,47 @@ public class AccountService {
         return repository.findByPhone(phoneNumber);
     }
 
-    @Component
-    class CreateAccountListener implements ApplicationListener<CreateAccountEvent> {
-        @Override
-        public void onApplicationEvent(CreateAccountEvent event) {
+
+    @EventListener
+    public void onApplicationEvent(CreateAccountEvent event) {
+        event.getSource()
+                .getEventStatus()
+                .set(saveAccount(event.getAccount()));
+    }
+
+    @EventListener
+    public void onApplicationEvent(CheckLoginAccountEvent event) {
+        Account account = findAccount(event.getAccount().getPhoneNumber(), event.getAccount().getPassword());
+        event.getSource()
+                .getEventStatus()
+                .set(account != null);
+    }
+
+    @EventListener
+    public void onApplicationEvent(GetAccountByPhoneAndPasswordEvent event) {
+        Account account = findAccount(event.getPhoneNumber(), event.getPassword());
+        boolean isReturn = account != null;
+        event.getSource()
+                .getEventStatus()
+                .set(isReturn);
+        if (isReturn) {
             event.getSource()
-                    .getEventStatus()
-                    .set(saveAccount(event.getAccount()));
+                    .getEventReturns()
+                    .set(account);
         }
     }
 
-    @Component
-    class CheckLoginAccountListener implements ApplicationListener<CheckLoginAccountEvent> {
-        @Override
-        public void onApplicationEvent(CheckLoginAccountEvent event) {
-            Account account = findAccount(event.getAccount().getPhoneNumber(), event.getAccount().getPassword());
+    @EventListener
+    public void onApplicationEvent(GetAccountByPhoneEvent event) {
+        Account account = findAccount(event.getPhoneNumber());
+        boolean isReturn = account != null;
+        event.getSource()
+                .getEventStatus()
+                .set(isReturn);
+        if (isReturn) {
             event.getSource()
-                    .getEventStatus()
-                    .set(account != null);
-        }
-    }
-
-    @Component
-    class GetAccountByPhoneAndPasswordListener implements ApplicationListener<GetAccountByPhoneAndPasswordEvent> {
-        @Override
-        public void onApplicationEvent(GetAccountByPhoneAndPasswordEvent event) {
-            Account account = findAccount(event.getPhoneNumber(), event.getPassword());
-            boolean isReturn = account != null;
-            event.getSource()
-                    .getEventStatus()
-                    .set(isReturn);
-            if (isReturn) {
-                event.getSource()
-                        .getEventReturns()
-                        .set(account);
-            }
-        }
-    }
-
-    @Component
-    class GetAccountByPhoneListener implements ApplicationListener<GetAccountByPhoneEvent> {
-        @Override
-        public void onApplicationEvent(GetAccountByPhoneEvent event) {
-            Account account = findAccount(event.getPhoneNumber());
-            boolean isReturn = account != null;
-            event.getSource()
-                    .getEventStatus()
-                    .set(isReturn);
-            if (isReturn) {
-                event.getSource()
-                        .getEventReturns()
-                        .set(account);
-            }
+                    .getEventReturns()
+                    .set(account);
         }
     }
 }

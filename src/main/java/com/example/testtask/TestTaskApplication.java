@@ -9,9 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan("com.example.testtask.models")
 @SpringBootApplication
 public class TestTaskApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(TestTaskApplication.class, args);
     }
-
 }

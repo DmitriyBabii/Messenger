@@ -31,13 +31,13 @@
         <div class="message-box">
             <div th:if="${chat != null}" th:each="mess : ${messages}">
                 <div class="message sent-message" th:if="${mess.account.phoneNumber == account.phoneNumber}">
-                    <p class="text-message" th:text="|${mess.text}|">A lot of texttttttttttttttttttttttttttttt</p>
+                    <p class="text-message" th:text="|${mess.text}|"></p>
                     <div class="time" th:text="|${mess.time}|">22:24</div>
                 </div>
 
                 <div class="message coming-message" th:unless="${mess.account.phoneNumber == account.phoneNumber}">
                     <p class="sender" th:text="|${mess.account.username}|">Michale</p>
-                    <p class="text-message" th:text="|${mess.text}|">A lot of texttttttttttttttttttttttttttttt</p>
+                    <p class="text-message" th:text="|${mess.text}|"></p>
                     <div class="time" th:text="|${mess.time}|">22:24</div>
                 </div>
             </div>

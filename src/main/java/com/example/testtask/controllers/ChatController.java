@@ -55,12 +55,16 @@ public class ChatController implements Eventable {
 
     @GetMapping("/create")
     public ModelAndView createChat(ModelAndView modelAndView) {
-        Chat chat = new Chat();
-        ChatMember member = new ChatMember();
-        modelAndView.addObject("member", member);
-        modelAndView.addObject("chat", chat);
-        modelAndView.setViewName("create-chat.html");
-        return modelAndView;
+        aep.publishEvent(new GetAccountByPhoneAndPasswordEvent(this, session.getPhoneNumber(), session.getPassword()));
+        if (status.get() && returns.isPresent()) {
+            Chat chat = new Chat();
+            ChatMember member = new ChatMember();
+            modelAndView.addObject("member", member);
+            modelAndView.addObject("chat", chat);
+            modelAndView.setViewName("create-chat.html");
+            return modelAndView;
+        }
+        return new ModelAndView("redirect:/chats");
     }
 
     @PostMapping("/create")

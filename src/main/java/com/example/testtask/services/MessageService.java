@@ -1,11 +1,11 @@
 package com.example.testtask.services;
 
 import com.example.testtask.events.messages.CreateMessageEvent;
+import com.example.testtask.interfaces.Eventable;
 import com.example.testtask.models.entity.Message;
 import com.example.testtask.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,17 +17,14 @@ public class MessageService {
         this.repository = repository;
     }
 
-    public void saveMessage(Message message) {
-        repository.save(message);
+    public Message saveMessage(Message message) {
+        return repository.save(message);
     }
 
-    @Component
-    public class CreateMessageListener implements ApplicationListener<CreateMessageEvent> {
-
-        @Override
-        public void onApplicationEvent(CreateMessageEvent event) {
-            saveMessage(event.getMessage());
-            event.getSource().getEventStatus().set(true);
-        }
+    @EventListener
+    public void onApplicationEvent(CreateMessageEvent event) {
+        Eventable source = event.getSource();
+        source.getEventReturns().set(saveMessage(event.getMessage()));
+        source.getEventStatus().set(true);
     }
 }

@@ -8,8 +8,7 @@ import com.example.testtask.models.entity.Account;
 import com.example.testtask.models.entity.Chat;
 import com.example.testtask.repositories.ChatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,8 +24,8 @@ public class ChatService {
         this.repository = repository;
     }
 
-    public void saveChat(Chat chat) {
-        repository.save(chat);
+    public Chat saveChat(Chat chat) {
+        return repository.save(chat);
     }
 
     public List<Chat> findByAccount(Account account) {
@@ -39,42 +38,33 @@ public class ChatService {
         return repository.findById(id);
     }
 
-    @Component
-    public class GetChatsListener implements ApplicationListener<GetChatsEvent> {
-        @Override
-        public void onApplicationEvent(GetChatsEvent event) {
-            List<Chat> chats = findByAccount(event.getAccount());
-            Eventable source = event.getSource();
-            if (chats != null) {
-                source.getEventStatus().set(true);
-                source.getEventReturns().set(chats);
-            }
+
+    @EventListener
+    public void onApplicationEvent(GetChatsEvent event) {
+        List<Chat> chats = findByAccount(event.getAccount());
+        Eventable source = event.getSource();
+        if (chats != null) {
+            source.getEventStatus().set(true);
+            source.getEventReturns().set(chats);
         }
     }
 
-    @Component
-    public class CreateChatListener implements ApplicationListener<CreateChatEvent> {
-        @Override
-        public void onApplicationEvent(CreateChatEvent event) {
-            saveChat(event.getChat());
-            event.getSource()
-                    .getEventStatus()
-                    .set(true);
-        }
+    @EventListener
+    public void onApplicationEvent(CreateChatEvent event) {
+        Eventable source = event.getSource();
+        source.getEventReturns().set(saveChat(event.getChat()));
+        source.getEventStatus().set(true);
     }
 
-    @Component
-    public class GetChatByIdListener implements ApplicationListener<GetChatByIdEvent> {
-        @Override
-        public void onApplicationEvent(GetChatByIdEvent event) {
-            Optional<Chat> chat = findById(event.getId());
-            Eventable source = event.getSource();
-            chat.ifPresent(
-                    it -> {
-                        source.getEventStatus().set(true);
-                        source.getEventReturns().set(it);
-                    }
-            );
-        }
+    @EventListener
+    public void onApplicationEvent(GetChatByIdEvent event) {
+        Optional<Chat> chat = findById(event.getId());
+        Eventable source = event.getSource();
+        chat.ifPresent(
+                it -> {
+                    source.getEventStatus().set(true);
+                    source.getEventReturns().set(it);
+                }
+        );
     }
 }
